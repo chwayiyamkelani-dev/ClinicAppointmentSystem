@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Workspace - Michaya Clinic</title>
+    <style>
+        :root { --primary-green: #046c4e; --bg-color: #f8fafc; --card-bg: #ffffff; --text-main: #1e293b; --text-muted: #64748b; --border-color: #e2e8f0; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); padding: 20px 40px; }
+        header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; }
+        .greeting h1 { font-size: 28px; font-weight: 600; margin-bottom: 5px; }
+        .greeting p { color: var(--text-muted); font-size: 14px; }
+        .header-actions { display: flex; align-items: center; gap: 15px; }
+        .btn-primary { background-color: var(--primary-green); color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; }
+        .dashboard-grid { display: grid; grid-template-columns: 3fr 2fr; gap: 20px; }
+        .card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; }
+        .card h2 { font-size: 16px; margin-bottom: 5px; }
+        .card > p { color: var(--text-muted); font-size: 13px; margin-bottom: 20px; }
+        .appt-box { border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; background-color: #fcfdfd; margin-bottom: 15px; }
+        .appt-header { display: flex; justify-content: space-between; margin-bottom: 15px; }
+        .badge { background-color: var(--primary-green); color: white; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; }
+        .appt-time { text-align: right; font-size: 13px; font-weight: 600; }
+        .appt-details h3 { font-size: 16px; margin-bottom: 4px; }
+        .appt-details p { color: var(--text-muted); font-size: 13px; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="greeting">
+            <span style="font-size: 12px; font-weight: bold; color: var(--text-muted);">Patient portal</span>
+            <h1 id="userNameHeading">Hello, Loading...</h1>
+            <p>Book a visit or manage your upcoming care.</p>
+        </div>
+        <div class="header-actions">
+            <button class="btn-primary">+ Book appointment</button>
+        </div>
+    </header>
+
+    <div class="dashboard-grid">
+        <div class="card">
+            <h2>Upcoming appointments</h2>
+            <p>Your next visits at Michaya Clinic.</p>
+            <div id="appointmentContainer">
+                <p style="color: #64748b;">Loading data from C++ Backend...</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Notifications</h2>
+            <p>Recent SMS and email confirmations.</p>
+            <div style="margin-top: 15px;">
+                <h4 style="font-size: 14px;">📞 Appointment confirmed</h4>
+                <p style="color: var(--text-muted); font-size: 12px;">SMS sent to +27 72 000 0000</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // This JavaScript asks your C++ server for the JSON data!
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Fetching the C++ API endpoint we created
+                const response = await fetch('http://localhost:8080/api/patient/224057231');
+                if (!response.ok) throw new Error('Network response was not ok');
+                
+                const data = await response.json();
+
+                // Injecting the C++ data into the HTML
+                document.getElementById('userNameHeading').innerText = `Hello, ${data.firstName}.`;
+                
+                const apptHtml = `
+                    <div class="appt-box">
+                        <div class="appt-header">
+                            <span class="badge">${data.appointment.status}</span>
+                            <div class="appt-time">${data.appointment.date}<br><span style="color: var(--text-muted); font-weight: normal;">${data.appointment.time}</span></div>
+                        </div>
+                        <div class="appt-details">
+                            <h3>${data.appointment.type}</h3>
+                            <p>${data.appointment.doctor} • ${data.appointment.room}</p>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('appointmentContainer').innerHTML = apptHtml;
+
+            } catch (error) {
+                console.error("Error connecting to C++ backend:", error);
+                document.getElementById('userNameHeading').innerText = "System Offline";
+            }
+        });
+    </script>
+</body>
+</html>
