@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Dashboard | Michaya Clinic</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 30px; color: #333; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 2px solid #e0e6ed; margin-bottom: 25px; }
+        .title-section h1 { margin: 0; color: #00565b; }
+        .title-section p { margin: 5px 0 0; color: #666; }
+        .dashboard-container { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { text-align: left; padding: 14px; border-bottom: 1px solid #e0e6ed; }
+        th { background-color: #f8fafc; color: #4a5568; font-weight: 600; }
+        tr:hover { background-color: #f1f5f9; }
+        .status-badge { background-color: #00565b; color: white; padding: 6px 12px; border-radius: 12px; font-size: 12px; font-weight: bold; }
+        .refresh-btn { background-color: #00565b; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .refresh-btn:hover { background-color: #004448; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="title-section">
+            <h1>Doctor's Overview</h1>
+            <p>Michaya Clinic - Daily Master Schedule</p>
+        </div>
+        <div>
+            <!-- Calls our new fetch function to update without reloading the page -->
+            <button class="refresh-btn" onclick="loadAppointments()">Refresh Schedule</button>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+        <h2>Upcoming Appointments</h2>
+        <table id="appointmentsTable">
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>Patient ID</th>
+                    <th>Patient Name</th>
+                    <th>Type</th>
+                    <th>Room</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <!-- Empty tbody. JavaScript will build the rows here! -->
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+
+    <script>
+        async function loadAppointments() {
+            try {
+                // Call the new C++ endpoint we just built
+               // Changed to 8081!
+const response = await fetch('/api/appointments');
+                const appointments = await response.json();
+                
+                const tableBody = document.getElementById('tableBody');
+                tableBody.innerHTML = ''; // Clear out the table
+                
+                // Loop through the SQLite database results and build the HTML rows
+                appointments.forEach(appt => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${appt.time}</td>
+                        <td>${appt.patientId}</td>
+                        <td>${appt.patientName}</td>
+                        <td>${appt.type}</td>
+                        <td>${appt.room}</td>
+                        <td><span class="status-badge">${appt.status}</span></td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error("Error loading appointments:", error);
+                document.getElementById('tableBody').innerHTML = '<tr><td colspan="6">Error loading database. Make sure the server is running.</td></tr>';
+            }
+        }
+
+        // Run the function as soon as the page loads
+        window.onload = loadAppointments;
+    </script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Appointment | Michaya Clinic</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f7f6; padding: 40px; color: #333; }
+        .form-container { background: white; padding: 30px; border-radius: 8px; max-width: 500px; margin: 0 auto; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        h2 { color: #00565b; margin-top: 0; border-bottom: 2px solid #e0e6ed; padding-bottom: 10px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .submit-btn { background-color: #00565b; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 15px; }
+        .submit-btn:hover { background-color: #004448; }
+        #statusMessage { margin-top: 15px; font-weight: bold; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Book a New Visit</h2>
+        <form id="bookingForm">
+            <div class="form-group">
+                <label>Student Number (ID)</label>
+                <input type="text" id="patientId" value="224057231" readonly>
+            </div>
+            <div class="form-group">
+                <label>Select Date</label>
+                <input type="date" id="apptDate" required>
+            </div>
+            <div class="form-group">
+                <label>Select Time</label>
+                <select id="apptTime">
+                    <option>09:00 - 09:30</option>
+                    <option>11:30 - 12:00</option>
+                    <option>14:00 - 14:30</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Reason for Visit</label>
+                <select id="apptType">
+                    <option>General medicine</option>
+                    <option>Check-up</option>
+                    <option>Prescription refill</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Available Doctor</label>
+                <select id="doctorName">
+                    <option>Dr. Mashazi</option>
+                    <option>Dr. Naidoo</option>
+                </select>
+            </div>
+            <button type="submit" class="submit-btn">Confirm Booking</button>
+        </form>
+        <div id="statusMessage"></div>
+    </div>
+
+    <script>
+        document.getElementById('bookingForm').addEventListener('submit', async (e) => {
+            e.preventDefault(); // Prevents the page from reloading
+            
+            // Package the form inputs into a JSON object
+            const newAppointment = {
+                patientId: document.getElementById('patientId').value,
+                date: document.getElementById('apptDate').value,
+                time: document.getElementById('apptTime').value,
+                type: document.getElementById('apptType').value,
+                doctor: document.getElementById('doctorName').value
+            };
+
+            try {
+                // Send the JSON to our new C++ POST endpoint
+                const response = await fetch('/api/book', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newAppointment)
+                });
+                
+                const result = await response.json();
+                const statusDiv = document.getElementById('statusMessage');
+                
+                if (result.success) {
+                    statusDiv.style.color = "green";
+                    statusDiv.innerText = "Success! Appointment booked securely.";
+                    document.getElementById('bookingForm').reset(); // Clear the form
+                    document.getElementById('patientId').value = "224057231"; // Keep ID filled
+                } else {
+                    statusDiv.style.color = "red";
+                    statusDiv.innerText = "Database Error: " + result.message;
+                }
+            } catch (error) {
+                document.getElementById('statusMessage').innerText = "Network error communicating with the C++ server.";
+            }
+        });
+    </script>
+</body>
+</html>
