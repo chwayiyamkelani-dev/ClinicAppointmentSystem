@@ -28,6 +28,11 @@ release/
 *.so
 *.dylib
 
+# Word
+~$*.docx
+~$*.doc
+*.doc
+
 # CMake
 CMakeFiles/
 CMakeCache.txt
