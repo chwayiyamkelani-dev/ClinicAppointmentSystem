@@ -4,7 +4,7 @@ Installation and Setup guide: The system is developed and tested using Windows.
 
 Step 1: Install and/or download the following software on your computer Git from the official Git website Visual Studio Code with C++ and CMake Tools extensions C++ compiler suitable for your operating system SQLite and ensure SQLite command-line tools are available
 
-Step 2: Clone the repository Use command-line: gh repo clone chwayiyamkelani-dev/ClinicAppointmentSystem Navigate into the project directory
+Step 2: Clone the repository Use command-line: https://github.com/khethelokungentando/ClinicAppointmentSystem.git Navigate into the project directory
 
 Step 3: Open project in Visual Studio Code Select File then Open Folder Select the project folder
 
