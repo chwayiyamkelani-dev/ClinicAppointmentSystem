@@ -19,6 +19,10 @@
 *.md text
 *.txt text
 
+# Word files
+*.docx binary
+*.doc  binary
+
 # SQL/database scripts
 *.sql text
 
